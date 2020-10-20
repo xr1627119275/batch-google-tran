@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="favicon.png">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
+    <title>谷歌翻译</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/moment.min.js"></script>
+  
+    <script src="js/copy.js"></script>
+    <link rel="stylesheet" href="css/message.css">
+    <script src="js/message.js"></script>
+    <style>
+      #result {
+        margin-top: 20px;
+        border: 2px solid #f6f6f6;
+        padding: 10px;
+      }
+      .content {
+        height: calc(100vh - 216px);
+        overflow: auto;
+      }
+      .input-group-text {
+        width: 158px;
+        text-align: right
+      }
+  
+      .tran-body {
+        margin: 10px 0
+      }
+  
+      .flex {
+        display: flex;
+      }
+  
+      .flex>.btn-danger {
+        margin-left: 5px
+      }
+  
+      .typeradio {
+        margin: 5px
+      }
+      #collapseExample {
+        padding: 10px;
+      }
+      .list-types {
+        width: 100%;
+      overflow: auto;
+      }
+    </style>
+  </head>
+  
+<body>
+  <div class="jumbotron text-center" style="padding: 20px">
+    <h1>批量谷歌翻译</h1>
+  </div>
+
+  <div class="container-fluid content">
+    <div class="row" style='height: 100%'>
+      <div class="col-md-6 col-sm-12" style='display: flex;flex-direction: column;'>
+        <div class="form-group">
+          <label for="sid">中文</label>
+          <input type="text" value="这是一条翻译" class="form-control" id="cn">
+        </div>
+
+        <div class="flex: 1;height: calc(100% - 86px)">
+          <div class="tran-body">
+            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">翻译选项</button>
+
+            <button type="button" id="tran" class="btn btn-primary" onclick="Tran()">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+              翻译
+            </button>
+
+            <br>
+            <br>
+            <div class="btn-group mr-2 list-types" >
+              
+              
+            </div>
+          </div>
+          <div class="collapse" id="collapseExample" >
+              <div class="row">
+
+              </div>
+              <!-- <ul class="list-group"> -->
+              <!-- <li class="list-group-item flex">
+                  <select name="type0" class="form-control" id="typeSelect">
+                  </select>
+                  <button class="btn btn-danger">remove</button>
+                </li> -->
+              <!-- <label class="btn btn-secondary active">
+                  <input type="radio" name="options" checked> Active
+                </label> -->
+              <!-- </ul> -->
+            </div>
+        </div>
+
+
+
+      </div>
+
+      <style>
+        #result {
+          position: relative;
+        }
+
+        #result.loading .spinner-grow {
+          position: absolute;
+          z-index: 100;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      </style>
+      <div class="col-md-6 col-sm-12">
+        <div id="result" class="text-center">
+          <div class="spinner-grow" style="width: 5rem; height: 5rem;display: none;" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+
+          <div class="res">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+
+    const langs = {
+      auto: 'Automatic',
+      af: 'Afrikaans',
+      sq: 'Albanian',
+      ar: 'Arabic',
+      hy: 'Armenian',
+      az: 'Azerbaijani',
+      eu: 'Basque',
+      be: 'Belarusian',
+      bn: 'Bengali',
+      bs: 'Bosnian',
+      bg: 'Bulgarian',
+      ca: 'Catalan',
+      ceb: 'Cebuano',
+      ny: 'Chichewa',
+      'zh-cn': 'Chinese Simplified',
+      'zh-tw': 'Chinese Traditional',
+      co: 'Corsican',
+      hr: 'Croatian',
+      cs: 'Czech',
+      da: 'Danish',
+      nl: 'Dutch',
+      en: 'English',
+      eo: 'Esperanto',
+      et: 'Estonian',
+      tl: 'Filipino',
+      fi: 'Finnish',
+      fr: 'French',
+      fy: 'Frisian',
+      gl: 'Galician',
+      ka: 'Georgian',
+      de: 'German',
+      el: 'Greek',
+      gu: 'Gujarati',
+      ht: 'Haitian Creole',
+      ha: 'Hausa',
+      haw: 'Hawaiian',
+      iw: 'Hebrew',
+      hi: 'Hindi',
+      hmn: 'Hmong',
+      hu: 'Hungarian',
+      is: 'Icelandic',
+      ig: 'Igbo',
+      id: 'Indonesian',
+      ga: 'Irish',
+      it: 'Italian',
+      ja: 'Japanese',
+      jw: 'Javanese',
+      kn: 'Kannada',
+      kk: 'Kazakh',
+      km: 'Khmer',
+      ko: 'Korean',
+      ku: 'Kurdish (Kurmanji)',
+      ky: 'Kyrgyz',
+      lo: 'Lao',
+      la: 'Latin',
+      lv: 'Latvian',
+      lt: 'Lithuanian',
+      lb: 'Luxembourgish',
+      mk: 'Macedonian',
+      mg: 'Malagasy',
+      ms: 'Malay',
+      ml: 'Malayalam',
+      mt: 'Maltese',
+      mi: 'Maori',
+      mr: 'Marathi',
+      mn: 'Mongolian',
+      my: 'Myanmar (Burmese)',
+      ne: 'Nepali',
+      no: 'Norwegian',
+      ps: 'Pashto',
+      fa: 'Persian',
+      pl: 'Polish',
+      pt: 'Portuguese',
+      ma: 'Punjabi',
+      ro: 'Romanian',
+      ru: 'Russian',
+      sm: 'Samoan',
+      gd: 'Scots Gaelic',
+      sr: 'Serbian',
+      st: 'Sesotho',
+      sn: 'Shona',
+      sd: 'Sindhi',
+      si: 'Sinhala',
+      sk: 'Slovak',
+      sl: 'Slovenian',
+      so: 'Somali',
+      es: 'Spanish',
+      su: 'Sudanese',
+      sw: 'Swahili',
+      sv: 'Swedish',
+      tg: 'Tajik',
+      ta: 'Tamil',
+      te: 'Telugu',
+      th: 'Thai',
+      tr: 'Turkish',
+      uk: 'Ukrainian',
+      ur: 'Urdu',
+      uz: 'Uzbek',
+      vi: 'Vietnamese',
+      cy: 'Welsh',
+      xh: 'Xhosa',
+      yi: 'Yiddish',
+      yo: 'Yoruba',
+      zu: 'Zulu'
+    }
+    
+    
+    async function Tran() {
+
+      $('#tran').attr('disabled', true)
+
+      if ($(".res").children().length > 0 ) {
+        $("#result").addClass('loading')
+      }
+      $('#tran>.spinner-border').show()
+      
+      $('#result .spinner-grow').show()
+      // $("#result").html("<h1 style='text-align: center'>加载中。。。</h1>")
+      let data = {
+        data: $('#cn').val(),
+        types: getCheckTypes()
+      }
+
+
+      let res = await gotranslate(data)
+      res = JSON.parse(res)
+      $('#tran').attr('disabled', false)
+          $('#tran>.spinner-border').hide()
+          $('#result .spinner-grow').hide()
+          $("#result").removeClass("loading")
+          let html = ''
+          if (res.success) {
+            for (const key in res.data) {
+              html += `
+                <div class="input-group " style="margin: 10px 0">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">${langs[key] || key}</span>
+                  </div>
+
+                  <input type="textarea" class="form-control" value="${res.data[key]}" >
+                  <div class="input-group-append" style='width: 50px' onclick='copy("${res.data[key]}")'>
+                    <span class="input-group-text" id="basic-addon2" >复制</span>
+                  </div>
+                </div>
+              `
+            }
+
+
+            $("#result>.res").html(html)
+          }
+      // $.ajax({
+      //   method: 'post',
+      //   url: "http://xrdev.top:3030/api/tran",
+      //   data: JSON.stringify({
+      //     data: $('#cn').val(),
+      //     types: getCheckTypes()
+      //   }),
+      //   contentType: "application/json",
+      //   dataType: "json",
+      //   success: (res) => {
+          
+      //   }
+      // })
+    }
+
+
+    function renderTypebtn() {
+      let types = JSON.parse(localStorage.getItem("m_types")) ||  ["Automatic", "Chinese Traditional", "English", "Italian", "Korean", "Polish", "Russian", "Spanish", "Uzbek"]
+      var html = ''
+
+      for (const key in langs) {
+        if (langs.hasOwnProperty(key)) {
+          const item = langs[key];
+          html += `
+          <label class="typeradio btn btn-secondary active">
+                <input type="checkbox" value='${item}' name="langs" > ${item}
+          </label> `
+        }
+      }
+      $(".collapse .row").html(html)
+      
+      console.log(types)
+      $("[name='langs']").each((i,item)=>{
+        if(types.includes(item.value)) {
+          $(item).prop("checked",true)
+        }
+      })
+
+      // Tran()
+
+      changeToList()
+      $("[name='langs']").on('change',changeToList)
+    }
+
+    function changeToList() {
+      let html = ''
+        $("[name='langs']").each((i,item)=>{
+          if( $(item).prop('checked')) {
+            html += `<button type="button" class="btn btn-secondary">${$(item).val()}</button>`
+          }
+        }) 
+        $('.list-types').html(html)
+    }
+
+    function setCheckTypes() {
+      localStorage.types || []
+
+    }
+
+    function copy(text) {
+      copyToClipboard(text)
+      $.message('复制成功');
+    }
+
+    function getCheckTypes() {
+      types = []
+      $("[name='langs']").each((i,item)=>{
+        if( $(item).prop('checked')) {
+              types.push($(item).val())
+          }
+      })
+
+      localStorage.setItem('m_types', JSON.stringify(types))
+      return types
+    }
+    $(renderTypebtn)
+  </script>
+    <!-- You can also require other files to run in this process -->
+    <script src="./renderer.js"></script>
+   
+  </body>
+</html>
