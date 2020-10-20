@@ -17,13 +17,16 @@
     <link rel="stylesheet" href="css/message.css">
     <script src="js/message.js"></script>
     <style>
+      html,body {
+        height: 100%;
+      }
       #result {
         margin-top: 20px;
         border: 2px solid #f6f6f6;
         padding: 10px;
       }
       .content {
-        height: calc(100vh - 216px);
+        height: calc(100vh - 128px);
         overflow: auto;
       }
       .input-group-text {
@@ -363,8 +366,6 @@
     }
     $(renderTypebtn)
   </script>
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
-   
+
   </body>
 </html>
