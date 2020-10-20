@@ -9,3 +9,9 @@
 ```shell script
 make
 ```
+
+
+### 运行截图
+![image](https://github.com/xr1627119275/batch-google-tran/markdown/main1.png)
+
+![image](https://github.com/xr1627119275/batch-google-tran/markdown/main2.png)
