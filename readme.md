@@ -12,6 +12,6 @@ make
 
 
 ### 运行截图
-![image](https://github.com/xr1627119275/batch-google-tran/markdown/main1.png)
+![主页面](https://github.com/xr1627119275/batch-google-tran/blob/master/markdown/main.png)
 
-![image](https://github.com/xr1627119275/batch-google-tran/markdown/main2.png)
+![多语言选择](https://github.com/xr1627119275/batch-google-tran/blob/master/markdown/main2.png)
