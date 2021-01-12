@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>检测到新版本！！！</title>
+
+    <style>
+        body,html {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #app {
+            width: 600px;
+            border-radius: 10px;
+            box-shadow: 1px 1px 10px #ccc;
+            padding: 20px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 60px;
+            text-align: center;
+        }
+        .body {
+            padding-left: 40px;
+        }
+        .download_box {
+            border: 1px solid #6e6e6e;
+            position: relative;
+            padding: 20px 0 20px 20px;
+        }
+
+        .download_box::before {
+            position: absolute;
+            content: 'github下载地址';
+            display: block;
+            height: 20px;
+            line-height: 20px;
+            background-color: #fff;
+            top: 0;
+            transform: translateY(-50%);
+            left: 10px;
+        }
+        a {
+            white-space:normal;word-wrap: break-word;word-break: break-all;
+        }
+        .download_box:last-child::before {
+            content: '加速渠道';
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="title">检测到新版本!!!</div>
+
+    <div v-if="data" class="body">
+        <h3>{{ data.name }}  </h3>
+        <h4>{{ new Date(data.published_at).toLocaleString() }}</h4>
+        <h5>{{ data.body }}</h5>
+
+        <p class="download_box" ><a :href="download_url">{{ download_url }}</a></p>
+        <p class="download_box" ><a :href="good_download_url">{{ good_download_url }}</a></p>
+    </div>
+
+</div>
+<script type="module">
+    import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js'
+
+    const app = new Vue({
+        el: "#app",
+        data: {
+            data: undefined
+        },
+        computed: {
+            download_url() {
+                return this.data?.assets?.[0]?.browser_download_url
+            },
+            good_download_url() {
+                return this.data?.assets?.[0]?.browser_download_url.replace('github.com','hub.fastgit.org')
+            }
+        },
+        async created(){
+            let res = await fetch("https://api.github.com/repos/xr1627119275/batch-google-tran/releases")
+            let data = await res.json()
+            this.data = data?.[0] || undefined
+            console.log(this.data, data)
+        }
+    })
+</script>
+</body>
+</html>

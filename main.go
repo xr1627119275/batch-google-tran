@@ -8,9 +8,20 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 )
 
+var needUpdate = false
+
+func CheckUpdate() {
+	needUpdate = true
+}
 func main() {
+
+	if os.Getenv("Mode") != "dev" {
+		CheckUpdate()
+		//HideConsole()
+	}
 	mux := http.NewServeMux()
 	box := packr.NewBox("./html")
 	//mux.Handle("/", http.FileServer(http.Dir("html")))
