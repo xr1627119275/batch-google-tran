@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>检测到新版本！！！</title>
-
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <style>
         body,html {
             width: 100vw;
@@ -26,6 +26,7 @@
         }
         .body {
             padding-left: 40px;
+            min-height: 312px;
         }
         .download_box {
             border: 1px solid #6e6e6e;
@@ -50,29 +51,50 @@
         .download_box:last-child::before {
             content: '加速渠道';
         }
+
+        .opt {
+            padding-left: 40px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
 <div id="app">
     <div class="title">检测到新版本!!!</div>
 
-    <div v-if="data" class="body">
-        <h3>{{ data.name }}  </h3>
-        <h4>{{ new Date(data.published_at).toLocaleString() }}</h4>
-        <h5>{{ data.body }}</h5>
+    <version-info :data="data"></version-info>
+    <div class="opt">
+        <el-button @click="showHistory" type="primary">{{ showMore ? '隐藏':'显示'}}历史版本</el-button>
+        <el-button @click="goIndex" type="danger">跳过</el-button>
+    </div>
 
+    <div class="moreList" v-if="showMore">
+        <version-info  v-for="(data,index) in extraData" :data="data" :key="index"></version-info>
+    </div>
+</div>
+
+<script type="text/html" id="infolist">
+    <div v-if="data" class="body">
+        <h3>{{ data.tag_name }} {{ data.name }}  </h3>
+        <h4 style="color: #1e7e34">{{ new Date(data.published_at).toLocaleString() }}</h4>
+        <h5>{{ data.body }}</h5>
         <p class="download_box" ><a :href="download_url">{{ download_url }}</a></p>
         <p class="download_box" ><a :href="good_download_url">{{ good_download_url }}</a></p>
     </div>
+</script>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
 
-</div>
-<script type="module">
-    import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js'
-
-    const app = new Vue({
-        el: "#app",
-        data: {
-            data: undefined
+    Vue.component("VersionInfo", {
+        template: "#infolist",
+        props: {
+            data: Object
         },
         computed: {
             download_url() {
@@ -82,12 +104,31 @@
                 return this.data?.assets?.[0]?.browser_download_url.replace('github.com','hub.fastgit.org')
             }
         },
+    })
+
+    const app = new Vue({
+        el: "#app",
+        data: {
+            data: undefined,
+            extraData: [],
+            showMore: false
+        },
+
+        methods: {
+            goIndex() {
+                location.href = 'index.html'
+            },
+            showHistory() {
+                this.showMore = !this.showMore
+            }
+        },
         async created(){
-            // let res = await fetch("https://api.github.com/repos/xr1627119275/batch-google-tran/releases")
-            // let data = await res.json()
-            let data = JSON.parse(await getUpdateInfo())
+            let res = await fetch("https://api.github.com/repos/xr1627119275/batch-google-tran/releases")
+            let data = await res.json()
+            // let data = JSON.parse(await getUpdateInfo())
             console.log(data)
             this.data = data?.[0] || undefined
+            this.extraData = data.slice(1)
             console.log(this.data, data)
         }
     })

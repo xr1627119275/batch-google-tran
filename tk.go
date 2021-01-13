@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	gt "github.com/kyai/google-translate-tk"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -62,8 +61,7 @@ func Tran(q string, langs []string, res *TkRes) {
 	if len(langs) == 0 {
 		langs = []string{"Automatic"}
 	}
-	//tk := gt.GetTK(q, tkk)
-	//fmt.Println("tk: ",tk)
+
 	var wg = &sync.WaitGroup{}
 	for _, item := range langs {
 		for key, val := range LangsMap {
@@ -76,9 +74,4 @@ func Tran(q string, langs []string, res *TkRes) {
 	}
 	wg.Wait()
 
-}
-
-func init() {
-	tkk, _ = gt.GetTKK()
-	fmt.Println("tkk: ", tkk)
 }
