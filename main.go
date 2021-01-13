@@ -27,9 +27,6 @@ func getInfo() (size int64, data string) {
 	defer res.Body.Close()
 	body, _ := ioutil.ReadAll(res.Body)
 
-	//var data []map[string]string
-	//json.Unmarshal(body, &data)
-
 	data = string(body)
 	fmt.Println(data)
 	r := regexp.MustCompile(`\"size\":(.+?),`)
@@ -52,15 +49,10 @@ func main() {
 	var size, data = getInfo()
 	if os.Getenv("Mode") != "dev" {
 		CheckUpdate(size)
-		//HideConsole()
 	}
 	mux := http.NewServeMux()
 	box := packr.NewBox("./html")
-	//mux.Handle("/", http.FileServer(http.Dir("html")))
 	mux.Handle("/", http.FileServer(box))
-	//mux.HandleFunc("/ajax", func(writer http.ResponseWriter, request *http.Request) {
-	//	writer.Write([]byte("bye bye ,this is v3 httpServer"))
-	//})
 
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -117,8 +109,6 @@ func main() {
 		"<script>   location.href = '" + fmt.Sprintf("http://%s%s", ln.Addr(), defaultUrl) + "' </script>" +
 		"</body" +
 		"></html>")
-
-	//ui.Load(fmt.Sprintf("http://%s", ln.Addr()))
 
 	<-ui.Done()
 }
