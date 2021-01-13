@@ -31,6 +31,7 @@ func getInfo() (size int64, data string) {
 	fmt.Println(data)
 	r := regexp.MustCompile(`\"size\":(.+?),`)
 	if r.MatchString(data) {
+		fmt.Println(r.FindStringSubmatch(data))
 		var data = r.FindStringSubmatch(data)[1]
 		size, _ = strconv.ParseInt(data, 10, 64)
 	}
@@ -47,9 +48,11 @@ func CheckUpdate(size int64) {
 }
 func main() {
 	var size, data = getInfo()
-	if os.Getenv("Mode") != "dev" {
-		CheckUpdate(size)
-	}
+	CheckUpdate(size)
+	//
+	//if os.Getenv("Mode") != "dev" {
+	//	CheckUpdate(size)
+	//}
 	mux := http.NewServeMux()
 	box := packr.NewBox("./html")
 	mux.Handle("/", http.FileServer(box))
@@ -65,7 +68,9 @@ func main() {
 
 	ui, _ := lorca.New("", "", 600, 900)
 	defer ui.Close()
-
+	ui.Bind("getSize", func() int64 {
+		return size
+	})
 	ui.Bind("getUpdateInfo", func() string {
 		return data
 	})

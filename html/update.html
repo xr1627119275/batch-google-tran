@@ -90,7 +90,9 @@
 <!-- import JavaScript -->
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script>
-
+    window.addEventListener("load",()=>{
+        document.title += " "
+    })
     Vue.component("VersionInfo", {
         template: "#infolist",
         props: {
@@ -111,7 +113,8 @@
         data: {
             data: undefined,
             extraData: [],
-            showMore: false
+            showMore: false,
+            versionSize: 0
         },
 
         methods: {
@@ -120,16 +123,36 @@
             },
             showHistory() {
                 this.showMore = !this.showMore
-            }
+            },
+
         },
         async created(){
             // let res = await fetch("https://api.github.com/repos/xr1627119275/batch-google-tran/releases")
             // let data = await res.json()
+
+            this.versionSize = await getSize()
             let data = JSON.parse(await getUpdateInfo())
             console.log(data)
             this.data = data?.[0] || undefined
             this.extraData = data.slice(1)
+
             console.log(this.data, data)
+        },
+        computed: {
+            version() {
+                let version = '[测试版]'
+                for (let i = 0; i < this.extraData; i++) {
+                    let item = this.extraData[i]
+                    if (item.asset[0].size == this.versionSize) {
+                        version = `[${item.tag_name}]`
+                        return version
+                    }
+                }
+                return version
+            }
+        },
+        mounted() {
+            document.title = this.version + document.title
         }
     })
 </script>
