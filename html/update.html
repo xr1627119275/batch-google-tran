@@ -123,9 +123,9 @@
             }
         },
         async created(){
-            let res = await fetch("https://api.github.com/repos/xr1627119275/batch-google-tran/releases")
-            let data = await res.json()
-            // let data = JSON.parse(await getUpdateInfo())
+            // let res = await fetch("https://api.github.com/repos/xr1627119275/batch-google-tran/releases")
+            // let data = await res.json()
+            let data = JSON.parse(await getUpdateInfo())
             console.log(data)
             this.data = data?.[0] || undefined
             this.extraData = data.slice(1)
