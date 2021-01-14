@@ -16,7 +16,7 @@ import (
 
 var needUpdate = false
 
-func getInfo() (size int64, data string) {
+func getInfo() (size int64, data string, tagName string) {
 	size = 0
 	url := "https://api.github.com/repos/xr1627119275/batch-google-tran/releases"
 	method := "GET"
@@ -31,9 +31,24 @@ func getInfo() (size int64, data string) {
 	fmt.Println(data)
 	r := regexp.MustCompile(`\"size\":(.+?),`)
 	if r.MatchString(data) {
-		fmt.Println(r.FindStringSubmatch(data))
-		var data = r.FindStringSubmatch(data)[1]
+
+		matchAll := r.FindAllStringSubmatch(data, -1)
+		fmt.Println(matchAll)
+
+		var data = matchAll[0][1]
 		size, _ = strconv.ParseInt(data, 10, 64)
+
+		stat, _ := os.Stat(os.Args[0])
+
+		for i := 0; i < len(matchAll); i++ {
+			var size, _ = strconv.ParseInt(matchAll[i][1], 10, 64)
+			if size == stat.Size() {
+				var jsonData []map[string]string
+				json.Unmarshal(body, &jsonData)
+				fmt.Println(jsonData[i]["tag_name"])
+				tagName = jsonData[i]["tag_name"]
+			}
+		}
 	}
 	return
 }
@@ -47,7 +62,7 @@ func CheckUpdate(size int64) {
 	}
 }
 func main() {
-	var size, data = getInfo()
+	var size, data, tagName = getInfo()
 	CheckUpdate(size)
 	//
 	//if os.Getenv("Mode") != "dev" {
@@ -70,6 +85,9 @@ func main() {
 	defer ui.Close()
 	ui.Bind("getSize", func() int64 {
 		return size
+	})
+	ui.Bind("getTagName", func() string {
+		return tagName
 	})
 	ui.Bind("getUpdateInfo", func() string {
 		return data

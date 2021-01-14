@@ -136,8 +136,9 @@
   </div>
 
   <script>
-
-
+    getTagName().then(tag=>{
+      document.title = `[${tag || '测试版' }]` + document.title
+    })
     const langs = {
       auto: 'Automatic',
       af: 'Afrikaans',
