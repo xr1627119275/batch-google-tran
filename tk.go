@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
+	"golang.org/x/sys/windows/registry"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -29,10 +31,12 @@ func tran(q string, to string, res *TkRes, wg *sync.WaitGroup) {
 	}()
 
 	var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" + to + "&dj=1&ie=UTF-8&oe=UTF-8&source=icon&dt=t&dt=bd&dt=qc&dt=rm&dt=ex&dt=at&dt=ss&dt=rw&dt=ld&q=" + url.QueryEscape(q)
+	//var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=zh-CN&dj=1&ie=UTF-8&oe=UTF-8&source=icon&dt=t&dt=bd&dt=qc&dt=rm&dt=ex&dt=at&dt=ss&dt=rw&dt=ld&q=test"
 	//var  url = "https://translate.google.cn/translate_a/single?client=t&sl=zh-cn&tl="+to+"&hl="+to+"&dt=t&ie=UTF-8&oe=UTF-8&otf=1&ssel=0&tsel=0&kc=7&q="+ url.QueryEscape(q)
 	//+"&tk=" + tk
-	resp, err := http.Get(url)
-	resp.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36")
+
+	resp, err := client.Get(url)
+	resp.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36")
 	if err != nil {
 		return
 	}
@@ -73,5 +77,34 @@ func Tran(q string, langs []string, res *TkRes) {
 		go tran(q, item, res, wg)
 	}
 	wg.Wait()
+
+}
+
+var client *http.Client
+
+func init() {
+	keys, err := registry.OpenKey(registry.CURRENT_USER, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", registry.ALL_ACCESS)
+
+	client = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			}, // 使用环境变量的代理
+			Proxy: http.ProxyFromEnvironment,
+		},
+	}
+	if err == nil {
+		value, _, err := keys.GetStringValue("ProxyServer")
+		fmt.Println("System Proxy: ", value)
+		if err == nil {
+			proxy := func(_ *http.Request) (*url.URL, error) {
+				return url.Parse("http://" + value)
+			}
+			transport := &http.Transport{Proxy: proxy}
+			client = &http.Client{
+				Transport: transport,
+			}
+		}
+	}
 
 }

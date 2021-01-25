@@ -13,5 +13,6 @@ require (
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/zserge/lorca v0.1.9
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
+	golang.org/x/sys v0.0.0-20190515120540-06a5c4944438
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
