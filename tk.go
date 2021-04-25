@@ -34,10 +34,11 @@ func tran(q string, to string, res *TkRes, wg *sync.WaitGroup) {
 	//var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=zh-CN&dj=1&ie=UTF-8&oe=UTF-8&source=icon&dt=t&dt=bd&dt=qc&dt=rm&dt=ex&dt=at&dt=ss&dt=rw&dt=ld&q=test"
 	//var  url = "https://translate.google.cn/translate_a/single?client=t&sl=zh-cn&tl="+to+"&hl="+to+"&dt=t&ie=UTF-8&oe=UTF-8&otf=1&ssel=0&tsel=0&kc=7&q="+ url.QueryEscape(q)
 	//+"&tk=" + tk
-
+	log.Println(url)
 	resp, err := client.Get(url)
 	resp.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36")
 	if err != nil {
+		log.Println(err)
 		return
 	}
 
@@ -90,8 +91,12 @@ func init() {
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			}, // 使用环境变量的代理
-			Proxy: http.ProxyFromEnvironment,
 		},
+	}
+
+	if err != nil {
+		log.Println("Get Proxy: ", err)
+		return
 	}
 	if err == nil {
 		value, _, err := keys.GetStringValue("ProxyServer")

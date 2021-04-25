@@ -64,10 +64,7 @@ func CheckUpdate(size int64) {
 func main() {
 	var size, data, tagName = getInfo()
 	CheckUpdate(size)
-	//
-	//if os.Getenv("Mode") != "dev" {
-	//	CheckUpdate(size)
-	//}
+
 	mux := http.NewServeMux()
 	box := packr.NewBox("./html")
 	mux.Handle("/", http.FileServer(box))
@@ -118,7 +115,6 @@ func main() {
 		}
 
 		return string(res)
-
 	})
 	var defaultUrl = ""
 	if needUpdate {
@@ -132,6 +128,5 @@ func main() {
 		"<script>   location.href = '" + fmt.Sprintf("http://%s%s", ln.Addr(), defaultUrl) + "' </script>" +
 		"</body" +
 		"></html>")
-
 	<-ui.Done()
 }
